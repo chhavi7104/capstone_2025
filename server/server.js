@@ -1,13 +1,25 @@
 require("dotenv").config();
+
 const connectDB = require("./config/db");
 const app = require("./app");
 
-const PORT = process.env.PORT || 5000;
+// Connect to MongoDB before handling requests
+connectDB()
+  .then(() => {
+    console.log("MongoDB connected successfully");
+  })
+  .catch((error) => {
+    console.error("MongoDB connection failed:", error);
+  });
 
-// Connect to MongoDB first, then start listening for requests.
-// This avoids serving traffic before the database is actually ready.
-connectDB().then(() => {
+// Export Express app for Vercel
+module.exports = app;
+
+// Local development
+if (require.main === module) {
+  const PORT = process.env.PORT || 5000;
+
   app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
   });
-});
+}

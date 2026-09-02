@@ -1,16 +1,19 @@
 const mongoose = require("mongoose");
 
-/**
- * Connects to MongoDB using the connection string in MONGO_URI.
- * Exits the process on failure because the API is useless without a database.
- */
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI);
+    if (mongoose.connection.readyState === 1) {
+      return mongoose.connection;
+    }
+
+    const conn = await mongoose.connect(process.env.MONGODB_URI);
+
     console.log(`MongoDB connected: ${conn.connection.host}`);
+
+    return conn;
   } catch (error) {
     console.error(`MongoDB connection error: ${error.message}`);
-    process.exit(1);
+    throw error;
   }
 };
 
