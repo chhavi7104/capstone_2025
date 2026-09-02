@@ -1,0 +1,22 @@
+services:
+  backend:
+    build:
+      context: ./server
+    container_name: college-platform-backend
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./server/.env
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./client
+      args:
+        VITE_API_BASE_URL: http://localhost:5000/api
+    container_name: college-platform-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
