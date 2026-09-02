@@ -3,25 +3,30 @@ const mongoose = require("mongoose");
 let connectionPromise = null;
 
 const connectDB = async () => {
-  // Already connected
+  console.log("DB: connectDB called");
+  console.log("DB: URI exists:", !!process.env.MONGODB_URI);
+
   if (mongoose.connection.readyState === 1) {
+    console.log("DB: already connected");
     return mongoose.connection;
   }
 
-  // Connection already in progress
   if (connectionPromise) {
+    console.log("DB: connection already in progress");
     return connectionPromise;
   }
 
   connectionPromise = mongoose
-    .connect(process.env.MONGODB_URI)
+    .connect(process.env.MONGODB_URI, {
+      serverSelectionTimeoutMS: 8000,
+    })
     .then((conn) => {
-      console.log(`MongoDB connected: ${conn.connection.host}`);
+      console.log("DB: MongoDB connected:", conn.connection.host);
       return conn;
     })
     .catch((error) => {
       connectionPromise = null;
-      console.error(`MongoDB connection error: ${error.message}`);
+      console.error("DB: MongoDB connection error:", error.message);
       throw error;
     });
 
